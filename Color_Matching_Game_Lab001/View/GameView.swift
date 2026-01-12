@@ -9,52 +9,44 @@ import SwiftUI
 
 struct GameView: View {
     @StateObject var viewModel: GameViewModel
+    let gridSize: Int
 
-    init(rows: Int, columns: Int) {
-        _viewModel = StateObject(wrappedValue: GameViewModel(rows: rows, columns: columns))
+    private let spacing: CGFloat = 10
+
+    init(gridSize: Int) {
+        _viewModel = StateObject(wrappedValue: GameViewModel(gridSize: gridSize))
+        self.gridSize = gridSize
     }
 
     var body: some View {
-        VStack {
-            // Display the score
-            Text("Score: \(viewModel.game.score)")
+        VStack(spacing: 20) {
+            Text("Score: \(viewModel.score)")
                 .font(.title)
-                .padding()
+                .bold()
 
-            GeometryReader { geometry in
-                let gridWidth = geometry.size.width // Full screen width
-                let buttonSpacing: CGFloat = 10
-                let numColumns = viewModel.game.grid.first?.count ?? 3
-                let buttonSize = (gridWidth - CGFloat(numColumns + 1) * buttonSpacing) / CGFloat(numColumns)
-
-                VStack(spacing: buttonSpacing) {
-                    ForEach(viewModel.game.grid.indices, id: \.self) { row in
-                        HStack(spacing: buttonSpacing) {
-                            ForEach(viewModel.game.grid[row].indices, id: \.self) { col in
-                                let tile = viewModel.game.grid[row][col]
-
-                                Button(action: {
-                                    viewModel.selectTile(at: row, column: col)
-                                }) {
-                                    Rectangle()
-                                        .fill(tile.isMatched ? Color.gray : tile.color)
-                                        .frame(width: buttonSize, height: buttonSize)
-                                        .cornerRadius(8)
-                                }
-                                .disabled(tile.isMatched) // Disable matched buttons
-                            }
+            // Grid Layout
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible(), spacing: spacing), count: gridSize),
+                spacing: spacing
+            ) {
+                ForEach(viewModel.grid.indices, id: \.self) { index in
+                    let cell = viewModel.grid[index]
+                    CellView(cell: cell)
+                        .onTapGesture {
+                            viewModel.selectCell(index)
                         }
-                    }
                 }
-                .frame(width: gridWidth)
             }
             .padding()
 
-            Spacer()
+            if viewModel.isGameOver() {
+                Text("Game Over! 🎉")
+                    .font(.largeTitle)
+                    .foregroundColor(.blue)
+            }
 
-            // New Game Button
-            Button("New Game") {
-                viewModel.generateGrid(rows: viewModel.game.grid.count, columns: viewModel.game.grid.first?.count ?? 3)
+            Button("Restart") {
+                viewModel.startNewGame(gridSize: gridSize)
             }
             .padding()
             .background(Color.blue)
@@ -62,7 +54,5 @@ struct GameView: View {
             .cornerRadius(10)
         }
         .padding()
-        .navigationTitle("Game On!")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }

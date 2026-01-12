@@ -10,38 +10,44 @@ import SwiftUI
 
 struct MenuView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
-                Text("Color Matching Game")
+                Text("🎨 Color Matching Game")
                     .font(.largeTitle)
+                    .bold()
                     .padding()
 
-                NavigationLink(destination: GameView(rows: 3, columns: 3)) {
-                    Text("Easy (3x3)").gameModeButtonStyle(backgroundColor: Color.green)
+                NavigationLink(destination: GameView(gridSize: 3)) {
+                    Text("Easy")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
                 }
 
-                NavigationLink(destination: GameView(rows: 5, columns: 5)) {
-                    Text("Medium (5x5)").gameModeButtonStyle(backgroundColor: Color.orange)
+                NavigationLink(destination: GameView(gridSize: 5)) {
+                    Text("Medium")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(Color.yellow)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
                 }
 
-                NavigationLink(destination: GameView(rows: 7, columns: 7)) {
-                    Text("Hard (7x7)").gameModeButtonStyle(backgroundColor: Color.red)
+                NavigationLink(destination: GameView(gridSize: 7)) {
+                    Text("Hard")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
                 }
             }
-            .navigationBarHidden(true)
-        }
-    }
-}
-
-extension Text {
-    func gameModeButtonStyle(backgroundColor: Color) -> some View {
-        self
-            .font(.title2)
             .padding()
-            .frame(maxWidth: .infinity)
-            .background(backgroundColor)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .padding(.horizontal, 40)
+        }
     }
 }
