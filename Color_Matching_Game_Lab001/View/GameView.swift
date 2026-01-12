@@ -11,7 +11,7 @@ struct GameView: View {
     @StateObject var viewModel: GameViewModel
     let gridSize: Int
 
-    private let spacing: CGFloat = 10
+    private let spacing: CGFloat = 4
 
     init(gridSize: Int) {
         _viewModel = StateObject(wrappedValue: GameViewModel(gridSize: gridSize))
@@ -33,16 +33,22 @@ struct GameView: View {
                     let cell = viewModel.grid[index]
                     CellView(cell: cell)
                         .onTapGesture {
-                            viewModel.selectCell(index)
+                            if !viewModel.isGameOver {
+                                viewModel.selectCell(index)
+                            }
                         }
                 }
             }
             .padding()
 
-            if viewModel.isGameOver() {
-                Text("Game Over! 🎉")
+            if viewModel.isGameOver {
+                Text("Game Over!")
                     .font(.largeTitle)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.red)
+            } else if viewModel.grid.allSatisfy({ $0.isMatched }) {
+                Text("You Win!")
+                    .font(.largeTitle)
+                    .foregroundColor(.green)
             }
 
             Button("Restart") {

@@ -12,7 +12,7 @@ struct MenuView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                Text("🎨 Color Matching Game")
+                Text("Color Basher")
                     .font(.largeTitle)
                     .bold()
                     .padding()
