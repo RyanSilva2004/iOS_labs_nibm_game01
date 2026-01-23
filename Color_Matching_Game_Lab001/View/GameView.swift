@@ -1,58 +1,66 @@
-//
-//  GameView.swift
-//  Color_Matching_Game_Lab001
-//
-//  Created by COBSCCOMP242P-059 on 2026-01-12.
-//
-
 import SwiftUI
 
 struct GameView: View {
     @StateObject var viewModel: GameViewModel
-    let gridSize: Int
-
-    private let spacing: CGFloat = 4
 
     init(gridSize: Int) {
         _viewModel = StateObject(wrappedValue: GameViewModel(gridSize: gridSize))
-        self.gridSize = gridSize
     }
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Score: \(viewModel.score)")
+            // Show Progress
+            Text("\(viewModel.progress)/\(viewModel.totalGroups) Pairs Matched")
                 .font(.title)
                 .bold()
 
+            // Show Lives with Heart Emojis
+            HStack {
+                ForEach(0..<viewModel.lives, id: \.self) { _ in
+                    Text("❤️")
+                        .font(.title)
+                }
+
+                if viewModel.showIncorrectAnimation {
+                    Text("-1")
+                        .font(.title2)
+                        .foregroundColor(.red)
+                        .transition(.opacity)
+                }
+            }
+
             // Grid Layout
             LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible(), spacing: spacing), count: gridSize),
-                spacing: spacing
+                columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: viewModel.gridSize),
+                spacing: 4
             ) {
                 ForEach(viewModel.grid.indices, id: \.self) { index in
                     let cell = viewModel.grid[index]
-                    CellView(cell: cell)
-                        .onTapGesture {
-                            if !viewModel.isGameOver {
-                                viewModel.selectCell(index)
-                            }
-                        }
+                    CellView(
+                        cell: cell,
+                        isPreviewVisible: viewModel.isPreviewVisible,
+                        isBombClicked: viewModel.clickedBombIndex == index
+                    )
+                    .onTapGesture {
+                        viewModel.selectCell(index)
+                    }
                 }
             }
             .padding()
 
+            // End-Game Messages
             if viewModel.isGameOver {
-                Text("Game Over!")
+                Text("Game Over! 💣")
                     .font(.largeTitle)
                     .foregroundColor(.red)
-            } else if viewModel.grid.allSatisfy({ $0.isMatched }) {
-                Text("You Win!")
+            } else if viewModel.hasWon {
+                Text("You Win! 🎉")
                     .font(.largeTitle)
                     .foregroundColor(.green)
             }
 
             Button("Restart") {
-                viewModel.startNewGame(gridSize: gridSize)
+                viewModel.startNewGame()
             }
             .padding()
             .background(Color.blue)

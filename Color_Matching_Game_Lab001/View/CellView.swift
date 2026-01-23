@@ -1,20 +1,21 @@
-//
-//  CellView.swift
-//  Color_Matching_Game_Lab001
-//
-//  Created by COBSCCOMP242P-059 on 2026-01-12.
-//
-
 import SwiftUI
 
 struct CellView: View {
     var cell: GridCell
+    var isPreviewVisible: Bool
+    var isBombClicked: Bool  // Whether the cell was clicked as a bomb
 
     var body: some View {
-        Rectangle()
-            .fill(cell.isMatched ? Color.gray : cell.color)
-            .opacity(cell.isSelected || cell.isMatched ? 1 : 0.7)
-            .aspectRatio(1, contentMode: .fit)
-            .animation(.easeInOut(duration: 0.2), value: cell.isSelected)
+        ZStack {
+            Rectangle()
+                .fill(isPreviewVisible || cell.isMatched || cell.isSelected ? (cell.color ?? Color.gray) : Color.gray)
+                .aspectRatio(1, contentMode: .fit)
+
+            // Show "💣" for bomb cells during the preview or when clicked
+            if (isPreviewVisible || isBombClicked) && cell.color == nil {
+                Text("💣")
+                    .font(.largeTitle)
+            }
+        }
     }
 }
